@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>あなたはどっち派？〜ヒミツのバレンタインデート〜</title>
+
+<style>
+  html,body{ margin:0; background:#000; font-family:"MS PGothic","Hiragino Kaku Gothic ProN",sans-serif; }
+  .wrap{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    box-sizing:border-box;
+  }
+  .frame{
+    width:960px; height:540px;
+    border-radius:16px; position:relative; overflow:hidden;
+    box-shadow:0 0 40px rgba(0,0,0,.6);
+    background:#000;
+    transform-origin:center;
+  }
+  .scene{
+    position:absolute; inset:0;
+    opacity:0; pointer-events:none;
+    transition: opacity .25s ease;
+  }
+  .scene.active{ opacity:1; pointer-events:auto; }
+
+  @media (max-width: 700px) and (hover: none) and (pointer: coarse){
+    .wrap{
+      padding:
+        calc(12px + env(safe-area-inset-top))
+        calc(12px + env(safe-area-inset-right))
+        calc(12px + env(safe-area-inset-bottom))
+        calc(12px + env(safe-area-inset-left));
+    }
+    .frame{
+      width:360px;
+      height:640px;
+      border-radius:12px;
+    }
+  }
+
+  /* =========================================================
+     TITLE
+     ========================================================= */
+  #sceneTitle .screen{
+    position:relative;
+    width:100%; height:100%;
+    overflow:hidden;
+    background:#000;
+    opacity:0;
+    animation: title_screenIn .18s ease forwards;
+  }
+  @keyframes title_screenIn{ to{ opacity:1; } }
+
+  #sceneTitle .bg{
+    position:absolute; inset:0;
+    background:url("./images/bg_title.png") center/cover no-repeat;
+    z-index:1;
+  }
+  /* タイトル背景に淡いキラキラ霧（素材不要） */
+  #sceneTitle .bg::after{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 20% 25%, rgba(255,200,235,0.18), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(200,220,255,0.14), transparent 50%),
+      radial-gradient(circle at 60% 75%, rgba(255,240,200,0.12), transparent 55%),
+      linear-gradient(180deg, rgba(0,0,0,0.22), rgba(0,0,0,0.55));
+    mix-blend-mode: screen;
+    pointer-events:none;
+  }
+
+  #sceneTitle .titleArea{
+    position:absolute;
+    left:50%;
+    top:46%;
+    transform:translate(-50%,-50%);
+    z-index:3;
+    width:min(620px, calc(100% - 80px));
+    opacity:0;
+  }
+  #sceneTitle .titleArea img{ width:100%; height:auto; display:block; }
+
+  #sceneTitle .menu{
+    position:absolute;
+    left:50%;
+    top: 72%;
+    transform:translateX(-50%);
+    z-index:4;
+    opacity:0;
+  }
+
+  #sceneTitle.runAnim .titleArea{
+    animation: title_logoIn .8s ease forwards;
+    animation-delay: .22s;
+  }
+  @keyframes title_logoIn{
+    from{ opacity:0; transform:translate(-50%,-50%) translateY(10px); }
+    to  { opacity:1; transform:translate(-50%,-50%) translateY(0); }
+  }
+
+  #sceneTitle.runAnim .menu{
+    animation: title_startIn .7s ease forwards;
+    animation-delay: .52s;
+  }
+  @keyframes title_startIn{
+    from{ opacity:0; transform:translateX(-50%) translateY(8px); }
+    to  { opacity:1; transform:translateX(-50%) translateY(0); }
+  }
+
+  /* ===== キラキラSTART ===== */
+  #sceneTitle .startBox{
+    position:relative;
+    width:240px;
+    padding:12px 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.28);
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35), transparent 45%),
+      radial-gradient(circle at 80% 35%, rgba(255,200,235,0.35), transparent 55%),
+      linear-gradient(180deg, rgba(255,120,190,0.78), rgba(120,140,255,0.62));
+    box-shadow:
+      0 14px 30px rgba(0,0,0,0.35),
+      0 0 0 2px rgba(255,255,255,0.12) inset,
+      0 0 18px rgba(255,160,215,0.22);
+    color:#fff;
+    font-size:16px;
+    cursor:pointer;
+    letter-spacing:0.6px;
+    transition:.15s;
+    -webkit-tap-highlight-color: transparent;
+    user-select:none;
+  }
+  #sceneTitle .startBox::before{
+    content:"";
+    position:absolute; inset:-2px;
+    border-radius:inherit;
+    background: linear-gradient(90deg,
+      rgba(255,255,255,0.0),
+      rgba(255,255,255,0.35),
+      rgba(255,255,255,0.0)
+    );
+    opacity:0;
+    transform: translateX(-30%);
+  }
+  #sceneTitle .startBox::after{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:inherit;
+    background:
+      radial-gradient(circle at 20% 40%, rgba(255,255,255,0.55), transparent 30%),
+      radial-gradient(circle at 75% 25%, rgba(255,240,200,0.45), transparent 35%),
+      radial-gradient(circle at 65% 70%, rgba(255,180,230,0.35), transparent 45%);
+    opacity:0.55;
+    pointer-events:none;
+    mix-blend-mode: screen;
+  }
+  #sceneTitle .startBox:hover{
+    transform: translateY(-2px) scale(1.01);
+    filter: brightness(1.06);
+  }
+  #sceneTitle .startBox:hover::before{
+    opacity:0.8;
+    animation: shineMove 0.9s ease forwards;
+  }
+  #sceneTitle .startBox:active{
+    transform: translateY(0px) scale(0.995);
+    filter: brightness(0.98);
+  }
+  @keyframes shineMove{
+    0%{ transform: translateX(-45%); }
+    100%{ transform: translateX(45%); }
+  }
+
+  #sceneTitle .pointer{
+    font-size:14px;
+    animation: title_blink .9s steps(2,end) infinite;
+  }
+  @keyframes title_blink{ 50%{ opacity:0; } }
+
+  #sceneTitle .screen.fadeout{
+    opacity:0;
+    transition: opacity .28s ease;
+  }
+
+  @media (max-width: 700px){
+    #sceneTitle .titleArea{ top:44%; width: calc(100% - 16px); max-width: 360px; }
+    #sceneTitle .menu{ top:62%; }
+    #sceneTitle .startBox{ width:220px; font-size:15px; }
+  }
+
+  /* =========================================================
+     SELECT
+     ========================================================= */
+  #sceneSelect .screen{
+    width:100%; height:100%;
+    background:url("./images/bg_title.png") center/cover no-repeat;
+    border-radius:inherit;
+    position:relative;
+    overflow:hidden;
+    opacity:0;
+    transform:translateY(6px);
+    animation: sel_screenIn .55s ease forwards;
+    transition: opacity .5s ease;
+  }
+  @keyframes sel_screenIn{to{opacity:1;transform:translateY(0);}}
+  #sceneSelect .screen.fadeout{opacity:0;}
+
+  #sceneSelect .cards{
+    position:absolute;
+    top:90px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:40px;
+  }
+
+  #sceneSelect .card{
+    width:360px;height:360px;
+    border-radius:16px;
+    position:relative;
+    opacity:0;
+    transform:translateY(10px);
+    animation: sel_cardIn .45s ease forwards;
+    transition: transform .35s ease, opacity .25s ease, filter .25s ease;
+    overflow:hidden;
+
+    /* キラキラカード */
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255,255,255,0.14), transparent 40%),
+      radial-gradient(circle at 80% 25%, rgba(255,200,235,0.16), transparent 45%),
+      linear-gradient(180deg, rgba(20,25,45,0.55), rgba(10,12,22,0.62));
+    border:1px solid rgba(255,255,255,0.16);
+    box-shadow:
+      0 18px 40px rgba(0,0,0,0.35),
+      0 0 0 2px rgba(255,255,255,0.08) inset,
+      0 0 22px rgba(255,160,215,0.10);
+  }
+  #sceneSelect .card:nth-child(1){animation-delay:.15s;}
+  #sceneSelect .card:nth-child(2){animation-delay:.28s;}
+  @keyframes sel_cardIn{to{opacity:1;transform:translateY(0);}}
+
+  #sceneSelect .card::after{
+    content:"";
+    position:absolute; inset:-40px;
+    background:
+      radial-gradient(circle at 15% 30%, rgba(255,255,255,0.22), transparent 18%),
+      radial-gradient(circle at 70% 20%, rgba(255,220,245,0.18), transparent 20%),
+      radial-gradient(circle at 80% 75%, rgba(255,240,200,0.16), transparent 22%),
+      radial-gradient(circle at 30% 80%, rgba(190,210,255,0.14), transparent 22%);
+    opacity:0.85;
+    pointer-events:none;
+    mix-blend-mode: screen;
+    transform: rotate(2deg);
+  }
+
+  #sceneSelect .card img{
+    position:absolute;
+    bottom:90px;
+    left:50%;
+    transform:translateX(-50%);
+    height:280px;
+    pointer-events:none;
+    user-select:none;
+    z-index:2;
+  }
+
+  #sceneSelect .namebox{
+    position:absolute;
+    bottom:20px;left:20px;right:20px;
+    border-radius:10px;
+    padding:12px 14px 14px;
+    color:#fff;
+    text-align:center;
+    z-index:3;
+
+    background:
+      linear-gradient(180deg, rgba(255,120,190,0.35), rgba(120,140,255,0.20)),
+      rgba(0,0,0,0.35);
+    border:1px solid rgba(255,255,255,0.20);
+    box-shadow:
+      0 0 0 2px rgba(0,0,0,0.18) inset,
+      0 10px 18px rgba(0,0,0,0.25);
+  }
+  #sceneSelect .namebox .info{font-size:15px; white-space:nowrap;}
+  #sceneSelect .select{margin-top:6px;font-size:14px;opacity:.92; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;}
+
+  #sceneSelect .card.active{
+    outline:2px solid rgba(255,255,255,.35);
+    box-shadow:
+      0 0 24px rgba(255,170,225,0.22),
+      0 0 40px rgba(180,200,255,0.14),
+      0 18px 40px rgba(0,0,0,0.35);
+    transform: translateY(-2px);
+  }
+  #sceneSelect .card.active .select::before{
+    content:"✦ ";
+    animation: sel_blink .9s steps(2,end) infinite;
+  }
+  @keyframes sel_blink{50%{opacity:0;}}
+
+  #sceneSelect .confirm{
+    position:absolute;
+    left:50%;
+    bottom:28px;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,.65);
+    border:2px solid rgba(255,255,255,.18);
+    border-radius:10px;
+    padding:10px 16px;
+    color:#fff;
+    font-size:16px;
+    opacity:0;
+    pointer-events:none;
+    z-index:10;
+  }
+  #sceneSelect .confirm.show{opacity:1; transition: opacity .2s ease;}
+
+  #sceneSelect .flash{
+    position:absolute;
+    inset:0;
+    background:#fff;
+    opacity:0;
+    pointer-events:none;
+    z-index:9999;
+  }
+  #sceneSelect .flash.on{animation: sel_flash .28s ease;}
+  @keyframes sel_flash{
+    0%{opacity:0;}
+    30%{opacity:.95;}
+    100%{opacity:0;}
+  }
+
+  @media (max-width:700px) and (hover:none) and (pointer:coarse){
+    #sceneSelect .cards{top:44px;flex-direction:column;gap:18px;}
+    #sceneSelect .card{width:320px;height:240px;border-radius:14px;}
+    #sceneSelect .card img{height:200px;bottom:58px;}
+    #sceneSelect .namebox{left:16px;right:16px;bottom:12px;}
+    #sceneSelect .namebox .info{font-size:14px;}
+    #sceneSelect .select{font-size:13px;}
+    #sceneSelect .confirm{bottom:30px;font-size:15px;}
+  }
+
+  /* =========================================================
+     GAME
+     ========================================================= */
+  #sceneGame .screen{
+    width:100%; height:100%;
+    background:url("./images/bg_title.png") center/cover no-repeat;
+    border-radius:inherit; position:relative; overflow:hidden;
+  }
+  #sceneGame .veil{
+    position:absolute; inset:0;
+    background:#000;
+    opacity:1;
+    z-index:999;
+    transition: opacity .9s ease;
+    pointer-events:none;
+  }
+  #sceneGame .veil.open{ opacity:0; }
+
+  #sceneGame .bgFade{
+    position:absolute; inset:0;
+    background:#000;
+    opacity:0;
+    pointer-events:none;
+    z-index:2;
+    transition: opacity .35s ease;
+  }
+  #sceneGame .bgFade.on{ opacity:0.9; }
+
+  #sceneGame .chara{
+    position:absolute;
+    left:50%;
+    bottom:20px;
+    height:500px;
+    user-select:none;
+    pointer-events:none;
+    opacity:0;
+    transform: translateX(-50%) translateY(6px);
+    transition: opacity .55s ease, transform .55s ease;
+    z-index:1;
+  }
+  #sceneGame .chara.show{
+    opacity:1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  #sceneGame .window{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:220px;
+    background:rgba(0,0,0,0.62);
+    border-top:3px solid rgba(255,255,255,0.14);
+    z-index:3;
+    opacity:0;
+    transform: translateY(10px);
+    transition: opacity .55s ease, transform .55s ease;
+  }
+  #sceneGame .window.show{ opacity:1; transform: translateY(0); }
+
+  #sceneGame .windowInner{
+    height:100%;
+    padding:12px 24px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    box-sizing:border-box;
+    min-height:0;
+  }
+
+  #sceneGame .toprow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color:#fff;
+    opacity:0.95;
+    font-size:16px;
+    gap:12px;
+  }
+
+  #sceneGame .leftTop{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+    flex:1;
+  }
+
+  #sceneGame .name{
+    font-weight:700;
+    color:#e8f2ff;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+
+  #sceneGame .meter{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+    flex:1;
+  }
+  #sceneGame .heart{ font-size:13px; opacity:0.95; flex-shrink:0; }
+
+  #sceneGame .meterBar{
+    flex:1;
+    height:8px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  /* ✅ 好感度バー：ピンク系 */
+  #sceneGame .meterFill{
+    height:100%;
+    width:0%;
+    background: linear-gradient(90deg,
+      rgba(255,130,190,0.95),
+      rgba(255,190,235,0.95),
+      rgba(255,240,190,0.85)
+    );
+    box-shadow:
+      0 0 10px rgba(255,160,215,0.45),
+      0 0 18px rgba(255,210,245,0.25);
+    transition: width .35s ease;
+  }
+
+  #sceneGame .qcount{
+    font-size:14px;
+    opacity:0.85;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+
+  #sceneGame .hr{
+    height:1px;
+    background:rgba(255,255,255,0.18);
+    width:100%;
+  }
+
+  #sceneGame .mainText{
+    margin-top:6px;
+    padding-left:4px;
+    color:#f2f2f2;
+    font-size:17px;
+    line-height:1.55;
+    text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    white-space:pre-wrap;
+    flex:1;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  #sceneGame .choices{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    flex-shrink:0;
+    margin-top:2px;
+  }
+
+  #sceneGame .choice{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#fff;
+    font-size:17px;
+    cursor:pointer;
+    user-select:none;
+    padding:1px 0;
+    opacity:0.92;
+    transform:translateY(2px);
+    -webkit-tap-highlight-color: transparent;
+  }
+  #sceneGame .choice:hover{
+    background:rgba(255,255,255,0.08);
+    filter:brightness(1.07);
+    transform:translateY(0px);
+  }
+  #sceneGame .pointer{
+    width:18px;
+    display:inline-block;
+    opacity:0.95;
+  }
+
+  @media (max-width: 700px) and (hover: none) and (pointer: coarse){
+    #sceneGame .chara{ height:380px; bottom:140px; }
+    #sceneGame .window{ height:260px; }
+    #sceneGame .windowInner{ padding:12px 16px 14px; gap:6px; }
+    #sceneGame .toprow{ font-size:14px; gap:10px; }
+    #sceneGame .qcount{ font-size:12px; }
+    #sceneGame .name{ max-width:44%; overflow:hidden; text-overflow:ellipsis; }
+
+#sceneGame .mainText{
+  font-size:16px;
+  line-height:1.6;
+  padding-left:2px;
+  margin-top:6px;
+}
+
+/* ▼質問モード（1行固定） */
+#sceneGame .mainText.questionMode{
+  flex: 0 0 auto;   /* ←これ追加 */
+  height: 1.6em;    /* ←1行固定 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ▼返答モード（フル表示） */
+#sceneGame .mainText.answerMode{
+  flex: 1 1 auto;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+    #sceneGame .choices{ margin-top: 8px; gap: 10px; padding-bottom: 0px; }
+    #sceneGame .choice{ font-size:16px; padding:4px 0; }
+  }
+
+  /* =========================================================
+     ENDING（背景：bg_title2.png）
+     ========================================================= */
+  #sceneEnding .screen{
+    width:100%; height:100%;
+    background:url("./images/bg_title2.png") center/cover no-repeat;
+    border-radius:inherit; position:relative; overflow:hidden;
+  }
+  #sceneEnding .veil{
+    position:absolute; inset:0;
+    background:#000; opacity:1;
+    z-index:999; pointer-events:none;
+    transition: opacity .9s ease;
+  }
+  #sceneEnding .veil.open{ opacity:0; }
+
+  #sceneEnding .chara{
+    position:absolute;
+    left:50%;
+    bottom:20px;
+    height:500px;
+    transform:translateX(-50%) translateY(6px);
+    opacity:0;
+    transition: opacity .55s ease, transform .55s ease;
+    pointer-events:none;
+    user-select:none;
+    z-index:2;
+  }
+  #sceneEnding .chara.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  #sceneEnding .window{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:220px;
+    background:rgba(0,0,0,0.62);
+    border-top:3px solid rgba(255,255,255,0.14);
+    z-index:3;
+    opacity:0;
+    transform: translateY(10px);
+    transition: opacity .55s ease, transform .55s ease;
+  }
+  #sceneEnding .window.show{ opacity:1; transform: translateY(0); }
+
+  #sceneEnding .windowInner{
+    height:100%;
+    padding:12px 24px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    box-sizing:border-box;
+  }
+  #sceneEnding .toprow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color:#fff;
+    opacity:0.95;
+    font-size:16px;
+    gap:12px;
+  }
+  #sceneEnding .name{ font-weight:700; color:#e8f2ff; }
+  #sceneEnding .badge{
+    font-size:12px; opacity:0.75;
+    border:1px solid rgba(255,255,255,0.25);
+    padding:4px 8px; border-radius:999px;
+    background:rgba(0,0,0,0.25);
+  }
+  #sceneEnding .hr{ height:1px; background:rgba(255,255,255,0.18); width:100%; }
+  #sceneEnding .mainText{
+    margin-top:6px;
+    padding-left:4px;
+    color:#f2f2f2;
+    font-size:17px;
+    line-height:1.55;
+    text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    white-space:pre-wrap;
+  }
+
+  #sceneEnding .resultOverlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.35);
+    z-index:5;
+  }
+  #sceneEnding .resultBox{
+    width:min(560px, 92%);
+    padding:18px 22px 16px;
+    border-radius:14px;
+    text-align:center;
+    background:linear-gradient(180deg, rgba(90,110,180,0.92), rgba(40,45,70,0.92));
+    box-shadow:
+      0 22px 60px rgba(0,0,0,0.55),
+      0 0 0 2px rgba(255,255,255,0.18) inset;
+    border:1px solid rgba(10,15,30,0.65);
+  }
+  #sceneEnding .resultTitle{
+    font-size:34px;
+    letter-spacing:2px;
+    margin:6px 0 6px;
+    font-weight:900;
+    color:#fff;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.75), 0 0 12px rgba(255,255,255,0.25);
+  }
+  #sceneEnding .resultSub{
+    color:rgba(255,255,255,0.88);
+    font-size:13px;
+    letter-spacing:0.6px;
+    margin-bottom:12px;
+  }
+  #sceneEnding .resultMenu{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  #sceneEnding .resultChoice{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:190px;
+    justify-content:center;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    user-select:none;
+    background:linear-gradient(180deg, rgba(35,45,85,0.75), rgba(20,25,45,0.78));
+    border:1px solid rgba(255,255,255,0.22);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.45) inset;
+    color:#fff;
+    font-size:16px;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .05s ease, filter .12s ease;
+  }
+  #sceneEnding .resultChoice:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+  #sceneEnding .caret{ width:18px; text-align:center; opacity:0; }
+  #sceneEnding .resultChoice.active .caret{ opacity:1; animation: end_blink .9s steps(2,end) infinite; }
+  @keyframes end_blink{ 50%{opacity:0;} }
+
+  @media (max-width: 700px) and (hover:none) and (pointer: coarse){
+    #sceneEnding .chara{ height:380px; bottom:120px; }
+    #sceneEnding .window{ height:260px; }
+    #sceneEnding .windowInner{ padding:12px 16px 14px; }
+    #sceneEnding .toprow{ font-size:14px; }
+    #sceneEnding .mainText{ font-size:16px; line-height:1.6; }
+    #sceneEnding .resultBox{ width:min(320px, 92%); padding:14px 14px 12px; }
+    #sceneEnding .resultTitle{ font-size:26px; letter-spacing:1px; }
+    #sceneEnding .resultChoice{ min-width:140px; font-size:15px; padding:9px 12px; }
+  }
+  /* ===== Ending ライブ強調 ===== */
+.liveHighlight{
+  color:#ffb3e6;
+  font-weight:700;
+  text-shadow:
+    0 0 8px rgba(255,160,215,0.9),
+    0 0 16px rgba(255,200,235,0.7),
+    0 0 28px rgba(255,120,190,0.6);
+}
+
+/* 成功時うっすら発光 */
+.endingFlash{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(circle at center,
+    rgba(255,180,230,0.35),
+    rgba(255,140,200,0.15),
+    transparent 70%);
+  opacity:0;
+  z-index:4;
+}
+.endingFlash.show{
+  animation: flashGlow 1s ease forwards;
+}
+@keyframes flashGlow{
+  0%{opacity:0;}
+  40%{opacity:1;}
+  100%{opacity:0;}
+}
+/* ===== ENDING シャキン！ ===== */
+#sceneEnding .flash{
+  position:absolute;
+  inset:0;
+  background:#fff;
+  opacity:0;
+  pointer-events:none;
+  z-index:9999;
+}
+
+#sceneEnding .flash.on{
+  animation: end_flash .28s ease;
+}
+
+@keyframes end_flash{
+  0%   { opacity:0; }
+  25%  { opacity:1; }
+  100% { opacity:0; }
+}
+</style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="frame" id="frame">
+
+      <!-- ✅ BGM -->
+      <audio id="bgm" src="./sounds/valentine_bgm.mp3" loop preload="auto"></audio>
+
+      <!-- TITLE -->
+      <section class="scene active" id="sceneTitle" aria-label="title">
+        <div class="screen" id="titleScreen">
+          <div class="bg"></div>
+
+          <div class="titleArea">
+            <img src="./images/title_logo.png" alt="title">
+          </div>
+
+          <div class="menu">
+            <div class="startBox" id="startBtn">
+              <div class="pointer">▶</div>
+              <div>START</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SELECT -->
+      <section class="scene" id="sceneSelect" aria-label="select">
+        <div class="flash" id="selFlash"></div>
+
+        <div class="screen" id="selScreen">
+          <div class="confirm" id="selConfirm">ゲームスタート！</div>
+
+          <div class="cards">
+            <div class="card" data-route="hirasaka">
+              <img src="./images/hirasaka.png" alt="hirasaka">
+              <div class="namebox">
+                <div class="info">ひらさか</div>
+                <div class="select">この人にする</div>
+              </div>
+            </div>
+
+            <div class="card" data-route="sosaku">
+              <img src="./images/sosaku.png" alt="sosaku">
+              <div class="namebox">
+                <div class="info">sosaku</div>
+                <div class="select">この人にする</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GAME -->
+      <section class="scene" id="sceneGame" aria-label="game">
+        <div class="screen" id="gameScreen">
+          <div class="veil" id="gameVeil"></div>
+          <div class="bgFade" id="gameBgFade"></div>
+
+          <img id="gameChara" class="chara" alt="chara" />
+
+          <div class="window" id="gameWindow">
+            <div class="windowInner">
+              <div class="toprow">
+                <div class="leftTop">
+                  <div class="name" id="gameName"></div>
+                  <div class="meter">
+                    <div class="heart">♥</div>
+                    <div class="meterBar"><div class="meterFill" id="meterFill"></div></div>
+                  </div>
+                </div>
+                <div class="qcount" id="qcount"></div>
+              </div>
+
+              <div class="hr"></div>
+              <div class="mainText" id="mainText"></div>
+              <div class="hr"></div>
+              <div class="choices" id="choices"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ENDING -->
+      <section class="scene" id="sceneEnding" aria-label="ending">
+        <div class="screen" id="endScreen">
+          <div class="flash" id="endFlash"></div>
+          <div class="endingFlash" id="endingFlash"></div>
+          <div class="veil" id="endVeil"></div>
+
+          <img id="endChara" class="chara" alt="chara" />
+
+          <div class="resultOverlay" id="endResultOverlay" aria-hidden="false">
+            <div class="resultBox">
+              <div class="resultTitle" id="endResultTitle">デート成功！</div>
+              <div class="resultSub" id="endResultSub">いい感じに距離が縮まった…！</div>
+
+              <div class="resultMenu" id="endResultMenu">
+                <div class="resultChoice" data-act="select">
+                  <span class="caret">▶</span><span>キャラ選択へ</span>
+                </div>
+                <div class="resultChoice" data-act="title">
+                  <span class="caret">▶</span><span>タイトルへ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="window" id="endWindow">
+            <div class="windowInner">
+              <div class="toprow">
+                <div class="name" id="endName"></div>
+                <div class="badge">ENDING</div>
+              </div>
+              <div class="hr"></div>
+              <div class="mainText" id="endLine">……静かな帰り道。</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+<script>
+/* =========================
+   シーン切替
+========================= */
+const scenes = {
+  title: document.getElementById("sceneTitle"),
+  select: document.getElementById("sceneSelect"),
+  game: document.getElementById("sceneGame"),
+  ending: document.getElementById("sceneEnding"),
+};
+function showScene(name){
+  Object.values(scenes).forEach(s => s.classList.remove("active"));
+  scenes[name].classList.add("active");
+}
+
+/* =========================
+   BGM（スマホ解錠対応）
+========================= */
+const bgm = document.getElementById("bgm");
+bgm.volume = 0.20;
+let bgmUnlocked = false;
+
+function resetBgmToStart(){ try { bgm.currentTime = 0; } catch(e){} }
+async function tryPlayBgmFromTop(){
+  resetBgmToStart();
+  try { await bgm.play(); bgmUnlocked = true; } catch(e) {}
+}
+function onEnterTitle(){ tryPlayBgmFromTop(); }
+function unlockBgmIfTitle(){
+  if(!scenes.title.classList.contains("active")) return;
+  if(bgmUnlocked) return;
+  tryPlayBgmFromTop();
+}
+window.addEventListener("pointerdown", unlockBgmIfTitle, { passive:true });
+window.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter" || e.key === " ") unlockBgmIfTitle();
+});
+
+/* =========================
+   タイトル演出
+========================= */
+const titleScene = document.getElementById("sceneTitle");
+function runTitleAnim(){
+  titleScene.classList.remove("runAnim");
+  void titleScene.offsetWidth;
+  titleScene.classList.add("runAnim");
+}
+
+/* =========================
+   データ
+========================= */
+const charaData = {
+  hirasaka:{ name:"ひらさか", img:"./images/hirasaka.png" },
+  sosaku:{  name:"sosaku",   img:"./images/sosaku.png"  }
+};
+
+/* ✅ あなたのストーリー反映 */
+const QUESTIONS = {
+  hirasaka: [
+    {
+      q:"Q1.9個入りのチョコを見つけた。",
+      bg:"./images/bg_tennnai.png",
+      a:[
+        { t:"9か〜少ないなぁ", score:0, next:"12…11….10…これは、君の命のカウントダウンだ。覚悟したまえ。" },
+        { t:"9ってなんだか落ち着く", score:2, next:"君は9の本当の価値を知っているようだ。ついてきたまえ。" },
+        { t:"9って多すぎるよ！なんかカッコいい！", score:1, next:"君の瞳の奥に嘘を感じる。" }
+      ]
+    },
+    {
+      q:"Q2.チョコの銀紙を見つめるひらさか",
+      bg:"./images/bg_tennnai.png",
+      a:[
+        { t:"銀紙の中のチョコが気になるのね！", score:0, next:"茶色の塊に興味がある訳ではない。" },
+        { t:"銀紙に反射した私の顔を見てるのね！", score:2, next:"まずいばれた！今度から直接ガン見するように心掛ける。" },
+        { t:"エロいことが頭から離れないから、情報量の少ない銀紙を見つめて気持ちを落ち着けようとしてるのね！", score:1, next:"性欲の実況解説、やめてな" }
+      ]
+    },
+    {
+      q:"Q3.「バレンタインチ◯コ、あげる！！」",
+      bg:"./images/bg_tennnai.png",
+      a:[
+        { t:"チョコ", score:2, next:"ありがとう。お返しにチョコじゃなくてチンコを送るよ。聞いてくれ、バレンタインチ◯コ。" },
+        { t:"チンコ", score:0, next:"不正解だ。何故なら、チンコをプレゼントするのは僕の方だから。聞いてくれーーーバレンタインチ◯コ。" },
+        { t:"チェコ", score:1, next:"バレンタインはそんなに世界的な行事になったの？" }
+      ]
+    },
+  ],
+
+  sosaku: [
+    {
+      q:"Q1.何個入りのチョコを用意する？",
+      bg:"./images/bg_hanamichi.png",
+      a:[
+        { t:"4個", score:0, next:"ベースの弦も4本だ。でも4は縁起が悪い数字、良くないことが起こるかもしれない……。" },
+        { t:"7個", score:2, next:"ラッキーセブン！明日はいいことがありそう！" },
+        { t:"8個", score:1, next:"いつか麻雀で八連荘できますように！" }
+      ]
+    },
+    {
+      q:"Q2.sosakuがこちらを見つめている。",
+      bg:"./images/bg_hanamichi.png",
+      a:[
+        { t:"本命チ◯コをあげる。", score:0, next:"ありがとう！君が僕のチ◯コになってくれるんだね。" },
+        { t:"義理チ◯コをあげる。", score:1, next:"こんな僕にチ◯コをくれるのは君だけだよ……。" },
+        { t:"チロルチ◯コをあげる。", score:2, next:"愛は大きさや数では表せないよね！と言ってすぐに食べてしまった。" }
+      ]
+    },
+    {
+      q:"Q3.帰り道。夕暮れが綺麗な空だった。",
+      bg:"./images/bg_hanamichi.png",
+      a:[
+        { t:"あたしのことどう思ってるの？", score:2, next:"チ◯コみたいで可愛いね！" },
+        { t:"破廉恥な気持ちに、、足早に帰宅。", score:1, next:"また、明日！" },
+        { t:"来月のホワイトデー。sosakuのチ◯コ！待ってるから！", score:0, next:"え？僕のチンコを？急にどうしちゃったの？" }
+      ]
+    },
+  ]
+};
+
+/* =========================
+   TITLE → SELECT
+========================= */
+const titleScreen = document.getElementById("titleScreen");
+const startBtn = document.getElementById("startBtn");
+
+function goToSelect(){
+  titleScreen.classList.add("fadeout");
+  setTimeout(()=>{
+    titleScreen.classList.remove("fadeout");
+    showScene("select");
+  }, 280);
+}
+startBtn.addEventListener("click", goToSelect);
+window.addEventListener("keydown", (e)=>{
+  if(scenes.title.classList.contains("active") && e.key==="Enter") goToSelect();
+});
+
+/* =========================
+   SELECT → GAME
+========================= */
+const selScreen = document.getElementById("selScreen");
+const selFlash = document.getElementById("selFlash");
+const selConfirm = document.getElementById("selConfirm");
+const selCards = [...document.querySelectorAll("#sceneSelect .card")];
+
+let selCur = 0;
+let selLocked = false;
+let routeState = "hirasaka";
+
+function selUpdate(){ selCards.forEach((c,i)=> c.classList.toggle("active", i===selCur)); }
+selUpdate();
+
+function decideRoute(route){
+  if(selLocked) return;
+  selLocked = true;
+  routeState = route;
+
+  selConfirm.classList.add("show");
+  selFlash.classList.remove("on");
+  void selFlash.offsetWidth;
+  selFlash.classList.add("on");
+
+  setTimeout(()=> selScreen.classList.add("fadeout"), 260);
+  setTimeout(()=>{
+    selScreen.classList.remove("fadeout");
+    selConfirm.classList.remove("show");
+    selLocked = false;
+    startGame(routeState);
+  }, 900);
+}
+
+selCards.forEach((card,i)=>{
+  card.addEventListener("click", ()=>{
+    if(selLocked) return;
+    selCur = i;
+    selUpdate();
+  });
+
+  card.querySelector(".select").addEventListener("click", (e)=>{
+    e.stopPropagation();
+    if(selLocked) return;
+    selCur = i;
+    selUpdate();
+    decideRoute(card.dataset.route);
+  });
+});
+
+window.addEventListener("keydown", (e)=>{
+  if(!scenes.select.classList.contains("active")) return;
+  if(selLocked) return;
+
+  if(e.key === "ArrowLeft"){
+    selCur = (selCur + selCards.length - 1) % selCards.length;
+    selUpdate();
+    e.preventDefault();
+  }
+  if(e.key === "ArrowRight"){
+    selCur = (selCur + 1) % selCards.length;
+    selUpdate();
+    e.preventDefault();
+  }
+  if(e.key === "Enter"){
+    decideRoute(selCards[selCur].dataset.route);
+    e.preventDefault();
+  }
+});
+
+/* =========================
+   GAME 本体
+========================= */
+const $gameName = document.getElementById("gameName");
+const $gameChara = document.getElementById("gameChara");
+const $qcount = document.getElementById("qcount");
+const $mainText = document.getElementById("mainText");
+const $choices = document.getElementById("choices");
+const $meterFill = document.getElementById("meterFill");
+
+const $gameVeil = document.getElementById("gameVeil");
+const $gameWindow = document.getElementById("gameWindow");
+const $gameScreen = document.getElementById("gameScreen");
+const $gameBgFade = document.getElementById("gameBgFade");
+
+let typingTimer = null;
+let locked = false;
+
+function typeSet(el, text, speed=28, done){
+  clearInterval(typingTimer);
+  const s = String(text ?? "");
+  el.textContent = "";
+  locked = true;
+
+  let i = 0;
+  typingTimer = setInterval(()=>{
+    el.textContent += s[i] ?? "";
+    i++;
+    if(i >= s.length){
+      clearInterval(typingTimer);
+      typingTimer = null;
+      locked = false;
+      done && done();
+    }
+  }, speed);
+}
+
+const clamp = (n,a,b)=> Math.max(a, Math.min(b, n));
+const sleep = (ms)=> new Promise(r=>setTimeout(r, ms));
+
+let gameState = null;
+
+function resetGameVisual(){
+  $gameVeil.classList.remove("open");
+  $gameWindow.classList.remove("show");
+  $gameChara.classList.remove("show");
+  $choices.innerHTML = "";
+  $mainText.textContent = "";
+  $qcount.textContent = "";
+}
+
+async function changeBg(url){
+  if(!url) return;
+  const cur = $gameScreen.dataset.bg || "";
+  if(cur === url) return;
+
+  if(!gameState.firstBgDone){
+    $gameScreen.style.background = `url("${url}") center/cover no-repeat`;
+    $gameScreen.dataset.bg = url;
+    gameState.firstBgDone = true;
+    return;
+  }
+
+  $gameBgFade.classList.add("on");
+  await sleep(200);
+  $gameScreen.style.background = `url("${url}") center/cover no-repeat`;
+  $gameScreen.dataset.bg = url;
+  await sleep(80);
+  $gameBgFade.classList.remove("on");
+}
+
+function updateMeter(){
+  const MIN_SCORE = -3;
+  const MAX_SCORE = 6;
+  const s = clamp(gameState.total, MIN_SCORE, MAX_SCORE);
+  const pct = ((s - MIN_SCORE) / (MAX_SCORE - MIN_SCORE)) * 100;
+  $meterFill.style.width = `${pct}%`;
+}
+
+function renderChoices(item){
+  $choices.innerHTML = "";
+  item.a.forEach((opt, idx)=>{
+    const btn = document.createElement("div");
+    btn.className = "choice";
+    btn.innerHTML = `<span class="pointer">▶</span><span>${opt.t}</span>`;
+    btn.onclick = ()=> { if(!locked) onChoose(opt); };
+
+    btn.style.opacity = 0;
+    $choices.appendChild(btn);
+
+    setTimeout(()=>{
+      btn.style.transition = "opacity 0.25s";
+      btn.style.opacity = 1;
+    }, idx * 260);
+  });
+}
+
+async function renderQuestion(){
+  const item = gameState.list[gameState.qi];
+  $qcount.textContent = `Q${gameState.qi+1}/${gameState.list.length}`;
+  await changeBg(item.bg || "./images/bg_title.png");
+  $mainText.classList.remove("answerMode");
+$mainText.classList.add("questionMode");
+  typeSet($mainText, item.q, 40, () => {
+    setTimeout(()=> renderChoices(item), 250);
+  });
+}
+
+/* =========================
+   ENDING（bg_title2.png）
+========================= */
+const $endVeil = document.getElementById("endVeil");
+const $endFlash = document.getElementById("endFlash");
+const $endWindow = document.getElementById("endWindow");
+const $endName = document.getElementById("endName");
+const $endChara = document.getElementById("endChara");
+const $endLine = document.getElementById("endLine");
+const $endResultTitle = document.getElementById("endResultTitle");
+const $endResultSub = document.getElementById("endResultSub");
+const endChoices = Array.from(document.querySelectorAll("#sceneEnding .resultChoice"));
+let endCur = 0;
+
+function setEndActive(){
+  endChoices.forEach((el,i)=> el.classList.toggle("active", i===endCur));
+}
+
+function endShakin(){
+  // ★ ENDの白フラッシュ（シャキン）を再発火させる
+  $endFlash.classList.remove("on");
+  void $endFlash.offsetWidth; // これが“③”のキモ（同じアニメを連続で効かせる）
+  $endFlash.classList.add("on");
+}
+
+function typeWriterHTML(el, text, speed=35, done){
+  el.innerHTML = "";
+
+  let i = 0;
+  const timer = setInterval(()=>{
+    const raw = text.slice(0, i+1);
+    el.innerHTML = raw.replace(
+      "渋谷チェルシーホテル",
+      '<span class="liveHighlight">渋谷チェルシーホテル</span>'
+    );
+    i++;
+    if(i >= text.length){
+      clearInterval(timer);
+      done && done();
+    }
+  }, speed);
+}
+
+function startEndingSimple(route, total){
+  showScene("ending");
+
+  const SUCCESS_LINE = 4;
+  const isSuccess = total >= SUCCESS_LINE;
+  const r = charaData[route] ? route : "hirasaka";
+
+  $endName.textContent = charaData[r].name;
+  $endChara.src = charaData[r].img;
+
+  let line = "";
+
+  if(r === "hirasaka"){
+    line = isSuccess
+      ? "今度は君のことが知りたい\n2/14渋谷チェルシーホテルで！"
+      : "チョコとチンコの見分けもつかないようじゃ、まだまだだね。";
+  }else{
+    line = isSuccess
+      ? "君といると落ち着くな、\n2/14渋谷チェルシーホテルで会えない？"
+      : "君って見境なくいやらしい言葉を連呼するんだね。見損なったよ";
+  }
+
+  $endResultTitle.textContent = isSuccess ? "デート成功！" : "デート失敗！";
+  $endResultSub.textContent   = isSuccess ? "いい感じに距離が縮まった…！" : "気まずい空気が流れてしまった…";
+
+  const flash = document.getElementById("endingFlash");
+
+  document.getElementById("endResultOverlay").style.display = "none";
+
+  $endVeil.classList.remove("open");
+  $endWindow.classList.remove("show");
+  $endChara.classList.remove("show");
+
+  setTimeout(()=> $endVeil.classList.add("open"), 200);
+  setTimeout(()=> $endWindow.classList.add("show"), 700);
+  setTimeout(()=> $endChara.classList.add("show"), 820);
+
+setTimeout(()=>{
+  typeWriterHTML($endLine, line, 35, ()=>{
+    if(isSuccess){
+      flash.classList.add("show");
+    }
+
+    // セリフ余韻 1秒
+    setTimeout(()=>{
+      
+      // ★ シャキン！
+      endShakin();
+
+      // シャキンの白が引くのを少し待つ
+      setTimeout(()=>{
+        document.getElementById("endResultOverlay").style.display = "flex";
+      }, 220);
+
+    }, 1000);
+  });
+}, 900);
+
+  endCur = 0;
+  setEndActive();
+}
+
+/* ending buttons */
+endChoices.forEach((el,i)=>{
+  el.addEventListener("mouseenter", ()=>{ endCur=i; setEndActive(); });
+  el.addEventListener("click", ()=>{
+    const act = el.dataset.act;
+    if(act === "select"){
+      showScene("select");
+    }else{
+      showScene("title");
+      runTitleAnim();
+      onEnterTitle();
+    }
+  });
+});
+
+/* ending key control */
+window.addEventListener("keydown", (e)=>{
+  if(!scenes.ending.classList.contains("active")) return;
+
+  if(e.key === "ArrowLeft"){
+    endCur = (endCur + endChoices.length - 1) % endChoices.length;
+    setEndActive();
+    e.preventDefault();
+  }
+  if(e.key === "ArrowRight"){
+    endCur = (endCur + 1) % endChoices.length;
+    setEndActive();
+    e.preventDefault();
+  }
+  if(e.key === "Enter"){
+    endChoices[endCur].click();
+    e.preventDefault();
+  }
+});
+
+function onChoose(opt){
+  $choices.innerHTML = "";
+
+  gameState.total += (opt.score ?? 0);
+  updateMeter();
+$mainText.classList.remove("questionMode");
+$mainText.classList.add("answerMode");
+  typeSet($mainText, `${opt.next || "……"}`, 40);
+
+  setTimeout(()=>{
+    gameState.qi++;
+    if(gameState.qi < gameState.list.length){
+      renderQuestion();
+    }else{
+      startEndingSimple(gameState.route, gameState.total);
+    }
+  },2600);
+}
+
+function startGame(route){
+  showScene("game");
+  resetGameVisual();
+
+  const r = charaData[route] ? route : "hirasaka";
+  $gameName.textContent = charaData[r].name;
+  $gameChara.src = charaData[r].img;
+
+  gameState = {
+    route: r,
+    list: QUESTIONS[r],
+    qi: 0,
+    total: 0,
+    firstBgDone: false,
+  };
+
+  updateMeter();
+
+  setTimeout(() => $gameVeil.classList.add("open"), 150);
+  setTimeout(() => $gameWindow.classList.add("show"), 650);
+  setTimeout(() => $gameChara.classList.add("show"), 780);
+  setTimeout(() => renderQuestion(), 950);
+}
+
+/* 初期表示 */
+showScene("title");
+runTitleAnim();
+onEnterTitle();
+</script>
+</body>
+</html>
