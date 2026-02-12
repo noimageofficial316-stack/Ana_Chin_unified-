@@ -917,9 +917,9 @@ const bgm = document.getElementById("bgm");
 const isMobile = window.matchMedia("(max-width: 700px) and (hover: none) and (pointer: coarse)").matches;
 
 if (isMobile) {
-  bgm.volume = 0.001;  // 📱スマホ用（小さめ）
+  bgm.volume = 0.0001;  // 📱スマホ用（小さめ）
 } else {
-  bgm.volume = 0.009;  // 💻PC用
+  bgm.volume = 0.03;  // 💻PC用
 }
 let bgmUnlocked = false;
 
