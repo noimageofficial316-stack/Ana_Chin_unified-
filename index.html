@@ -912,7 +912,15 @@ function showScene(name){
    BGM（スマホ解錠対応）
 ========================= */
 const bgm = document.getElementById("bgm");
-bgm.volume = 0.009;
+
+// スマホ判定
+const isMobile = window.matchMedia("(max-width: 700px) and (hover: none) and (pointer: coarse)").matches;
+
+if (isMobile) {
+  bgm.volume = 0.001;  // 📱スマホ用（小さめ）
+} else {
+  bgm.volume = 0.009;  // 💻PC用
+}
 let bgmUnlocked = false;
 
 function resetBgmToStart(){ try { bgm.currentTime = 0; } catch(e){} }
